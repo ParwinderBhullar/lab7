@@ -1,4 +1,4 @@
-# 🧾 Lab 7 – Stored Procedures and Secure Dynamic SQL (DSL) Programming  
+# Lab 7 – Stored Procedures and Secure Dynamic SQL (DSL) Programming  
 **Course:** SQL Server Development  
 **Database:** AdventureWorks2022  
 **Schema Used:** `Reporting`  
@@ -11,7 +11,7 @@
 
 ---
 
-## 🧱 Overview
+## Overview
 This lab demonstrates how to build **secure, reusable, and idempotent stored procedures** in SQL Server, with a focus on preventing SQL injection attacks through **parameterized dynamic SQL** and **input validation**.
 
 The work includes:
@@ -25,7 +25,7 @@ All procedures are implemented within the `Reporting` schema in the **AdventureW
 
 ---
 
-## ⚙️ Stored Procedures and Their Purpose
+## Stored Procedures and Their Purpose
 
 | Procedure | Description | Key Features |
 |------------|-------------|---------------|
@@ -37,4 +37,28 @@ All procedures are implemented within the `Reporting` schema in the **AdventureW
 | **`Reporting.SafeUpdateProductCost`** | Safely updates a product’s `ListPrice` using a transaction. | Includes rollback and logs errors to `Reporting.ExecutionLog`. |
 
 ---
+
+## SQL Injection Prevention
+
+SQL injection was prevented in this project by using secure dynamic SQL techniques directly in the stored procedures.
+
+### How SQL Injection Was Prevented
+
+- **Parameterized Dynamic SQL (`sp_executesql`)**  
+  All procedures that use dynamic SQL (such as `Reporting.SecureProductSearch` and `Reporting.DynamicSalesReport`) rely on `sp_executesql` with parameters instead of concatenating user input into the SQL command.  
+  This ensures SQL Server treats user input as data, not as executable code.  
+  Example from the script:
+  ```sql
+  DECLARE @SQL NVARCHAR(MAX) = N'
+      SELECT ProductID, Name
+      FROM Production.Product
+      WHERE Name LIKE @Pattern';
+
+  DECLARE @Pattern NVARCHAR(102) = N'%' + @Category + N'%';
+
+  EXEC sp_executesql
+      @SQL,
+      N'@Pattern NVARCHAR(102)',
+      @Pattern;
+
 
